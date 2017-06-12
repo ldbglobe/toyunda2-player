@@ -1,0 +1,15 @@
+{
+  "name": "toyunda2-player",
+  "version": "1.0.0",
+  "description": "Toyunda Player Component (MPV interface to read kara) - receive .kara filepath to work with",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-ini": "^1.0.0",
+    "node-mpv": "^1.0.3"
+  }
+}
