@@ -94,6 +94,3 @@ module.exports = function(options){
 
 	return instance;
 };
-
-/*
-			*/
