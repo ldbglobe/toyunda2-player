@@ -25,7 +25,7 @@ module.exports = function(options){
 		"--fps=60",
 	]);
 
-	return {
+	var instance = {
 		_options: {
 			path_karas:  options.path_karas  ? options.path_karas  : './',
 			path_lyrics: options.path_lyrics ? options.path_lyrics : './',
@@ -88,6 +88,11 @@ module.exports = function(options){
 			this._playlist = [];
 		}
 	}
+	mpvPlayer.on('stopped',function(){
+		instance.next()
+	});
+
+	return instance;
 };
 
 /*
