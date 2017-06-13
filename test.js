@@ -1,36 +1,40 @@
 var path = require('path');
 
+// Simulation d'un gestionnaire de playlist bouclant sur 2 morceaux
+
+var playlist = [
+	{
+		video:'Dragon Ball - OP - Maka fushigi Adventure.avi',
+		subtitle:'Dragon Ball - OP - Maka fushigi Adventure.ass',
+		title:'Dragon Ball - OP - Maka fushigi Adventure',
+		message:'Requested by @lordb',
+		kara_id:1,
+	},
+	{
+		video:'Dragon Ball Z - OP1 - Cha-la Head Cha-la.avi',
+		subtitle:'Dragon Ball Z - OP1 - Cha-la Head Cha-la.ass',
+		title:'Dragon Ball Z - OP1 - Cha-la Head Cha-la',
+		message:'Requested by @lordb',
+		kara_id:2,
+	},
+];
+var idx = 0;
+
+function play()
+{
+	kara = playlist[idx%2];
+	console.log("Starting of \""+kara.title+"\"");
+	player.play(kara);
+	idx++;
+}
+
 var player = require('./index.js')({
-	path_karas:path.resolve(__dirname,'./samples/karas'),
-	path_lyrics:path.resolve(__dirname,'./samples/lyrics'),
 	path_videos:path.resolve(__dirname,'./samples/videos'),
+	path_subtitles:path.resolve(__dirname,'./samples/lyrics'),
+	onEnd:function(kara){
+		console.log("End of current song \""+kara.title+"\"");
+		play();
+	}
 });
 
-/*
-// on peux ajouter les kara un par un
-// player.addKara(@kara_file, $kara_id)
-// @kara_file : nom du fichier kara à utiliser
-// @k_id : identifiant unique du kara dans la base de données (optionnel)
-player.addKara('JAP - Dragon Ball - OP - Maka fushigi Adventure.kara',1);
-player.addKara('JAP - Dragon Ball Z - OP1 - Cha-la Head Cha-la.kara',2);
-player.play();
-*/
-
-// ou charger directement une playlist complete
-// le gestionnaire de playlist pourra donc fournir directement un tableau listant les fichier kara à charger
-player.setPlaylist([
-	{file:'JAP - Dragon Ball - OP - Maka fushigi Adventure.kara', id:1},
-	{file:'JAP - Dragon Ball Z - OP1 - Cha-la Head Cha-la.kara', id:2}
-]);
-player.play();
-
-console.log('Press any key to play next kara');
-process.stdin.setRawMode(true);
-process.stdin.resume();
-process.stdin.once('data', function(){
-	player.next();
-	console.log('Press any key to exit');
-	process.stdin.setRawMode(true);
-	process.stdin.resume();
-	process.stdin.once('data', process.exit.bind(process, 0));
-});
+play();

@@ -1,13 +1,6 @@
+var fs = require('fs');
 var path = require('path');
 var ini = require('node-ini');
-
-var readkara = function(path)
-{
-	var cfg = ini.parseSync(path);
-	for(var i in cfg)
-		cfg[i]  = cfg[i].replace(/^"/,'').replace(/"$/,'');
-	return cfg;
-}
 
 module.exports = function(options){
 
@@ -23,74 +16,87 @@ module.exports = function(options){
 	[
 		//"--fullscreen",
 		"--fps=60",
+		"--screen=1",
 	]);
 
 	var instance = {
 		_options: {
-			path_karas:  options.path_karas  ? options.path_karas  : './',
-			path_lyrics: options.path_lyrics ? options.path_lyrics : './',
+			path_subtitles: options.path_subtitles ? options.path_subtitles : './',
 			path_videos: options.path_videos ? options.path_videos : './',
 		},
 		_player:mpvPlayer,
-		_playlist:[],
-		_current:false,
+		_playing:false,
+		_kara:null,
 
-		play: function(){
-			if(!this._current) {
-				this.next();
-			}
-			else {
-				var kara = readkara(path.resolve(this._options.path_karas, this._current.file));
-				if(kara.videofile)
+		play: function(kara){
+			this._kara = kara;
+			if(kara) {
+				if(kara.video)
 				{
-					var video = path.resolve(this._options.path_videos, kara.videofile);
-					console.log('playing : '+kara.videofile);
-					this._player.loadFile(video);
-					this._player.volume(70);
-					this._player.play();
-					if(kara.subfile) {
-						var lyrics = path.resolve(this._options.path_lyrics, kara.subfile);
-						console.log('subtitle : '+kara.subfile);
-						this._player.addSubtitles(lyrics);//, flag, title, lang)
+					var video = path.resolve(this._options.path_videos, kara.video);
+					if(fs.existsSync(video)){
+						console.log('playing : '+kara.video);
+						this._player.loadFile(video);
+						this._player.volume(70);
+						this._player.play();
+
+						// video may need some delay to play
+						setTimeout(function(){
+							this._playing = true;
+							if(kara.subtitle)
+							{
+								var lyrics = path.resolve(this._options.path_subtitles, kara.subtitle);
+								if(fs.existsSync(lyrics)){
+									console.log('subtitle : '+kara.subtitle);
+									this._player.addSubtitles(lyrics);//, flag, title, lang)
+								}
+								else
+								{
+									console.log('Can not found subtitle '+kara.subtitle)
+								}
+							}
+							else
+							{
+								console.log('No subtitle');
+							}
+							this._player.loadFile(path.resolve(__dirname,'__blank__.png'),'append');
+							// TODO : try to customize color, font-size and position of this message
+							this._player.command("show-text",[kara.title+' '+kara.message,2000]);
+						}.bind(this),500);
+					}
+					else {
+						console.log('Can not found video '+kara.video)
 					}
 				}
-				else {
-					console.log('Can not found videofile reference in '+this._current.file)
+				else
+				{
+					console.log('No video');
 				}
+			}
+			else
+			{
+				this.stop();
 			}
 		},
 		pause: function(){
-
+			this._player.pause();
 		},
-		next: function(){
-			if(this._playlist.length) {
-				this._current = this._playlist.shift();
-				this.play();
-			}
-			else {
-				console.log('Empty playlist');
-			}
+		resume: function(){
+			this._player.play();
 		},
-		addKara:function(kara_file,kara_id){
-			// add kara at the end of playlist
-			this._playlist.push({file:kara_file,id:kara_id});
-		},
-		removeKara:function(kara_id){
-			// remove all "kara_id" reference from the playlist
-			// kara added without id can not be remove by this method
-		},
-		setPlaylist:function(karaArray){
-			// replace current playlit by this one
-			this._playlist = karaArray;
-		},
-		clearPlaylist:function(){
-			// purge current playlist
-			this._playlist = [];
-		}
 	}
-	mpvPlayer.on('stopped',function(){
-		instance.next()
-	});
 
+	instance._player.on('statuschange',function(status){
+		if(instance._playing && status && status.filename && status.filename.match(/__blank__/))
+		{
+			// immediate switch to Playing = False to avoid multiple trigger
+			instance._playing = false;
+			instance._player.pause();
+			if(typeof options.onEnd === 'function')
+			{
+				options.onEnd(instance._kara);
+			}
+		}
+	});
 	return instance;
 };
