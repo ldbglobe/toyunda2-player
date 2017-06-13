@@ -1,15 +1,20 @@
 var fs = require('fs');
 var path = require('path');
-var ini = require('node-ini');
 
 module.exports = function(options){
 
+	if(!fs.existsSync(options.path_mpv)){
+		console.log('Unable to found mpv.exe');
+		console.log('Received path was : '+options.path_mpv);
+		return false;
+	}
+
 	var mpvAPI = require('node-mpv');
 	var mpvPlayer = new mpvAPI({
-		"audio_only": false,
-		binary: path.resolve(__dirname, './mpv.exe'),
+		audio_only: false,
+		binary: path.join(options.path_mpv,'mpv.exe'),
 		socket: '\\\\.\\pipe\\mpvsocket',
-		"time_update": 1,
+		time_update: 1,
 		verbose: false,
 		debug: false,
 	},
@@ -33,7 +38,7 @@ module.exports = function(options){
 			if(kara) {
 				if(kara.video)
 				{
-					var video = path.resolve(this._options.path_videos, kara.video);
+					var video = path.join(this._options.path_videos, kara.video);
 					if(fs.existsSync(video)){
 						console.log('playing : '+kara.video);
 						this._player.loadFile(video);
@@ -45,7 +50,7 @@ module.exports = function(options){
 							this._playing = true;
 							if(kara.subtitle)
 							{
-								var lyrics = path.resolve(this._options.path_subtitles, kara.subtitle);
+								var lyrics = path.join(this._options.path_subtitles, kara.subtitle);
 								if(fs.existsSync(lyrics)){
 									console.log('subtitle : '+kara.subtitle);
 									this._player.addSubtitles(lyrics);//, flag, title, lang)
@@ -59,7 +64,7 @@ module.exports = function(options){
 							{
 								console.log('No subtitle');
 							}
-							this._player.loadFile(path.resolve(__dirname,'__blank__.png'),'append');
+							this._player.loadFile(path.join(__dirname,'__blank__.png'),'append');
 							// TODO : try to customize color, font-size and position of this message
 							this._player.command("show-text",[kara.title+' '+kara.message,2000]);
 						}.bind(this),500);

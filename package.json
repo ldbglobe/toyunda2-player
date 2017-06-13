@@ -1,15 +1,23 @@
 {
   "name": "toyunda2-player",
   "version": "1.0.0",
-  "description": "Toyunda Player Component (MPV interface to read kara) - receive .kara filepath to work with",
+  "description": "Toyunda Player Component",
   "main": "index.js",
   "scripts": {
-    "test": "node ./test.js"
+    "test": "node ./test.js",
+    "build": "concurrently \"pkg package.json --out-dir build\" \"node build.js\""
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "concurrently": "^3.4.0",
+    "cp": "^0.2.0",
+    "ncp": "^2.0.0",
     "node-ini": "^1.0.0",
     "node-mpv": "^1.0.3"
-  }
+  },
+  "bin": {
+    "test": "./test.js"
+  },
+  "pkg": {}
 }
