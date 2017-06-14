@@ -43,6 +43,9 @@ module.exports = function(options){
 						console.log('playing : '+kara.video);
 						this._player.loadFile(video);
 						this._player.volume(70);
+						// TODO : try to customize color, font-size and position of this message
+						this._player.setProperty('osc','yes');
+						this._player.freeCommand('show-text "${osd-ass-cc/0}{\\\\alpha&H50&}{\\\\an7}'+kara.title+' {\\\\N} {\\\\b1}'+kara.message+'${osd-ass-cc/1}${osd-ass-cc/1}" 10000');
 						this._player.play();
 
 						// video may need some delay to play
@@ -65,8 +68,6 @@ module.exports = function(options){
 								console.log('No subtitle');
 							}
 							this._player.loadFile(path.join(__dirname,'__blank__.png'),'append');
-							// TODO : try to customize color, font-size and position of this message
-							this._player.command("show-text",[kara.title+' '+kara.message,2000]);
 						}.bind(this),500);
 					}
 					else {
