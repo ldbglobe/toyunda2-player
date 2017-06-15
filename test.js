@@ -30,11 +30,11 @@ function play()
 
 // get real binary systeme path
 // used to build real path to ressources (mpv, video, sub, ...)
-var basepath = require('./_get_basepath.js')('mpv.exe'); // test by fileExists on "mpv.exe"
+var basepath = require('./_get_basepath.js')('bin/mpv.exe'); // test by fileExists on "mpv.exe"
 
 
 var player = require('./index.js')({
-	path_mpv:path.join(basepath,'./'), // path to the folder containing mpv player binaries
+	path_mpv:path.join(basepath,'./bin'), // path to the folder containing mpv player binaries
 	path_videos:path.join(basepath,'samples/videos'),
 	path_subtitles:path.join(basepath,'samples/lyrics'),
 	onEnd:function(kara){
