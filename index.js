@@ -32,6 +32,7 @@ module.exports = function(options){
 		_player:mpvPlayer,
 		_playing:false,
 		_kara:null,
+		_message_timeout:null,
 
 		play: function(kara){
 			this._kara = kara;
@@ -44,8 +45,13 @@ module.exports = function(options){
 						this._player.loadFile(video);
 						this._player.volume(70);
 						// TODO : try to customize color, font-size and position of this message
+						clearTimeout(this._message_timeout);
 						this._player.setProperty('osc','yes');
-						this._player.freeCommand('show-text "${osd-ass-cc/0}{\\\\alpha&H50&}{\\\\an7}'+kara.title+' {\\\\N} {\\\\b1}'+kara.message+'${osd-ass-cc/1}${osd-ass-cc/1}" 10000');
+						this._player.freeCommand('show-text "${osd-ass-cc/0}{\\\\alpha&H50&\\\\an7}'+kara.title+'${osd-ass-cc/1}" 3000');
+						this._message_timeout = setTimeout(function(){
+							this._player.freeCommand('show-text "${osd-ass-cc/0}{\\\\alpha&H50&\\\\an3}'+kara.message+'${osd-ass-cc/1}" 3000');
+						}.bind(this),3000);
+
 						this._player.play();
 
 						// video may need some delay to play
