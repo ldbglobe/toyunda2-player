@@ -44,7 +44,8 @@ module.exports = function(options){
 						console.log('playing : '+kara.video);
 						this._player.loadFile(video);
 						this._player.volume(70);
-						// TODO : try to customize color, font-size and position of this message
+						// TODO : parse ass file and build a temporary file to inject some changes
+						// (eg . default style correction or add line to display title and message)
 						clearTimeout(this._message_timeout);
 						this._player.setProperty('osc','yes');
 						this._player.freeCommand('show-text "${osd-ass-cc/0}{\\\\alpha&H50&\\\\an7}'+kara.title+'${osd-ass-cc/1}" 3000');
