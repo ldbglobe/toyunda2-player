@@ -13,6 +13,7 @@
     "concurrently": "^3.4.0",
     "cp": "^0.2.0",
     "ncp": "^2.0.0",
+    "node-ffprobe": "git+https://github.com/ListenerApproved/node-ffprobe.git",
     "node-ini": "^1.0.0",
     "node-mpv": "^1.0.3"
   },
